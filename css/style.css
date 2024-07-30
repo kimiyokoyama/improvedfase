@@ -184,3 +184,185 @@ button.svg-button > svg {
   width: 2rem;
   height: 2rem;
 }
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+form > .input-group {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+
+  min-height: 4rem;
+  border-top: 1px solid var(--cr-border-primary);
+  padding: 1rem 0;
+}
+
+.input-group--disabled *:not(input[type="checkbox"]) {
+  opacity: 0.5;
+}
+
+form > .input-group:last-of-type {
+  border-bottom: 1px solid var(--cr-border-primary);
+  margin-bottom: 1rem;
+}
+
+form > .input-group output {
+  display: inline-block;
+}
+
+.input-group-half {
+  gap: 0.5rem;
+  width: 50%;
+}
+
+.input-group-half.right-align {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.range-labels {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  width: 6rem;
+}
+
+.annotated-input {
+  display: flex;
+  flex: 1;
+  width: 50%;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.input-group-half.space-align {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-group-half.space-align input[type="number"] {
+  width: 100%;
+}
+
+select, input[type="number"], input[type="text"], textarea {
+  padding: 0.5rem;
+  border: 2px solid var(--cr-border-primary);
+  border-radius: var(--br-radius-small);
+  background-color: var(--cr-bg-primary);
+  color: var(--cr-text-primary);
+  font-size: 1rem;
+  transition: all 0.20s ease-in-out;
+}
+
+select:focus, input[type="number"]:focus {
+  background-color: var(--cr-bg-secondary);
+}
+
+input[type="number"] {
+  width: 50%;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+input[type="checkbox"] {
+  position: relative;
+  overflow: hidden;
+  appearance: none;
+  height: 2rem;
+  width: 3.5rem;
+  border-radius: 50px;
+  outline: none;
+  border: none;
+  background-color: var(--cr-bg-contrast);
+  transition: all ease-in-out 0.2s;
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--cr-primary);
+}
+
+input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background-color: rgb(255, 255, 255);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  transition: all cubic-bezier(0.3, 1.5, 0.7, 1) 0.3s;
+  z-index: 2;
+}
+
+input[type="checkbox"]:checked::before {
+  transform: translateX(1.5rem);
+}
+
+input[type="checkbox"]:disabled {
+  background-color: #D1D1D6;
+}
+
+input[type="checkbox"]:disabled::before {
+  background-color: #8E8E93;
+}
+
+select:disabled {
+  cursor: not-allowed;
+}
+
+textarea {
+  resize: none;
+  width: 100%;
+}
+
+em {
+  font-style: italic;
+  color: var(--cr-warning);
+}
+
+fieldset.radio-group {
+  border: none;
+}
+
+fieldset.radio-group ul {
+  list-style: none;
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+fieldset.radio-group input[type="radio"] {
+  opacity: 0;
+  position: absolute;
+  background-color: var(--bg-contrast);
+}
+
+fieldset.radio-group input[type="radio"]:checked + label {
+  background-color: var(--cr-primary);
+  color: var(--cr-text-contrast);
+}
+
+fieldset.radio-group label {
+  padding: 0.75rem 1rem;
+  display: inline-block;
+  color: var(--cr-text-primary);
+  background-color: var(--cr-bg-primary);
+  border: 1px solid var(--cr-border-primary);
+  border-radius: var(--br-radius-small);
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}

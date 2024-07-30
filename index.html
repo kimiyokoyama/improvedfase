@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
   <title>FaSe | Faux Sequence Mutator</title>
   <meta property="og:title" content="FaSe | Faux Sequence Mutator">
@@ -34,5 +34,66 @@
       </li>
     </ul>
   </nav>
+  <main>
+    <div>
+      <section>
+        <form id="mutate-form">
+          <div class="input-group">
+            <div class="input-group-half">
+                <label for="sequence-type">Sequence Type</label>
+            </div>
+            <div class="input-group-half">
+                <fieldset id="sequence-type" class="radio-group">
+                    <ul>
+                      <li>
+                          <input type="radio" id="peptide-radio" name="sequence-type" value="peptide" checked>
+                          <label for="peptide-radio">Peptide</label>
+                      </li>
+                      <li>
+                          <input type="radio" id="nucleotide-radio" name="sequence-type" value="nucleotide">
+                          <label for="nucleotide-radio">Nucleotide</label>
+                      </li>
+                    </ul>
+                </fieldset>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-half">
+                <label for="sequence">Sequence</label>
+            </div>
+            <div class="input-group-half">
+                <textarea id="sequence" name="sequence" required></textarea>
+            </div>
+          </div>
+          <div class="input-group range">
+            <div class="input-group-half">
+                <label for="divergence-percentage">Divergence Percentage</label>
+            </div>
+            <div class="input-group-half">
+                <div class="range-group">
+                    <input type="range" id="divergence-percentage" name="divergence-percentage" min="0" max="1" step="0.001" value="0.1">
+                    <input type="number" id="divergence-percentage-value" name="divergence-percentage-value" min="0" max="1" step="0.001" value="0.1" required>
+                </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-half">
+                <label for="max-children">Maximum Children Per Parent</label>
+            </div>
+            <div class="input-group-half right-align">
+                <input type="number" id="max-children" name="max-children" min="0" step="1" value="1" required>
+            </div>
+          </div>
+          <button type="submit" id="mutate-button">Mutate</button>
+        </form>
+      </section>
+    </div>
+    <div>
+      <section>
+        <h2>This is temporary</h2>
+        <div id="mutation-list"></div>
+      </section>
+    </div>
+  </main>
 </body>
 </html>
