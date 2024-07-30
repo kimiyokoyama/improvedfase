@@ -8,7 +8,7 @@ const randomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
  * Denotes common nucleotide swaps
  * @type {Object.<string, string[]>}
  */
-const NUCLEOTIDE_COMMON_SWAP = {
+const NUCLEOTIDE_TRANSITIONS = {
   "A": ["G"],
   "C": ["T"],
   "G": ["A"],
@@ -19,7 +19,7 @@ const NUCLEOTIDE_COMMON_SWAP = {
  * Denotes rarer nucleotide swaps
  * @type {Object.<string, string[]>}
  */
-const NUCLEOTIDE_ALT_SWAP = {
+const NUCLEOTIDE_TRANSVERSIONS = {
   "A": ["C", "T"],
   "C": ["A", "G"],
   "G": ["C", "T"],
@@ -62,22 +62,17 @@ function mutateNucleotide(nucleotide) {
   nucleotide = nucleotide.toUpperCase();
   // 0.1 chance of indels
   if (Math.random() < 0.1) {
-    if (Math.random() < 0.5) {
-      return "";
-    } else {
-      // original nucleotide has random ACGT added to the end
-      return nucleotide + randomItem(["A", "C", "G", "T"]);
-    }
+    return Math.random() < 0.75 ? "" : nucleotide + randomItem(["A", "C", "G", "T"]);
   }
   // if not a swap key, return the original nucleotide
-  if (!NUCLEOTIDE_COMMON_SWAP.hasOwnProperty(nucleotide)) {
+  if (!NUCLEOTIDE_TRANSITIONS.hasOwnProperty(nucleotide)) {
     return nucleotide;
   }
   // 2/3 chance of common swap, 1/3 chance of alt swap
   if (Math.random() < 2/3) {
-    return randomItem(NUCLEOTIDE_COMMON_SWAP[nucleotide]);
+    return randomItem(NUCLEOTIDE_TRANSITIONS[nucleotide]);
   } else {
-    return randomItem(NUCLEOTIDE_ALT_SWAP[nucleotide]);
+    return randomItem(NUCLEOTIDE_TRANSVERSIONS[nucleotide]);
   }
 }
 /**
@@ -89,12 +84,7 @@ function mutateNucleotide(nucleotide) {
 function mutateAminoAcid(aminoAcid) {
   // small chance of indels
   if (Math.random() < 0.075) {
-    if (Math.random() < 0.5) {
-      return "";
-    } else {
-      // original amino acid has random amino acid added to the end
-      return aminoAcid + randomItem(Object.keys(BLOSUM62_MODIFIED));
-    }
+    return Math.random() < 0.5 ? "" : aminoAcid + randomItem(Object.keys(BLOSUM62_MODIFIED));
   }
   // if not a swap key, return fairly random amino acid
   if (!BLOSUM62_MODIFIED.hasOwnProperty(aminoAcid)) {
@@ -118,17 +108,22 @@ function mutateAminoAcid(aminoAcid) {
  * @param {string} sequence - sequence to be mutated
  * @param {(string) => string} mutateFn - function to mutate a single nucleotide
  * @param {number} divergencePercentage - percentage of the sequence to be mutated
+ * @returns {Object.<string, any>} mutated sequence and list of intermediate mutations
  */
 function mutateSequence(sequence, mutateFn, divergencePercentage) {
   if (sequence.length < 1) return sequence;
   const sequenceArray = sequence.split("");
   const numMutations = Math.max(1, Math.floor(sequenceArray.length * divergencePercentage));
+  let mutationList = [];
   for (let i = 0; i < numMutations; i++) {
     const index = Math.floor(Math.random() * sequenceArray.length);
     // replace index with mutation
-    sequenceArray.splice(index, 1, ...mutateFn(sequenceArray[index]));
+    const mutation = mutateFn(sequenceArray[index]);
+    const mutationType = mutation.length > 1 ? "insert" : mutation.length < 1 ? "delete" : "swap";
+    sequenceArray.splice(index, 1, ...mutation);
+    mutationList.push({ mutations: [{ index, mutation, mutationType }], sequence: sequenceArray.join("") });
   }
-  return sequenceArray.join("");
+  return { sequence: sequenceArray.join(""), mutationList };
 }
 
 export {
