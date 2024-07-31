@@ -15,7 +15,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="css/style.css">
-  <link rel="stylesheet" type="text/css" href="css/style.css">
   <!-- following script will execute after the page has loaded -->
   <script type="module" src="js/main.js" defer></script>
 </head>
@@ -34,10 +33,30 @@
       </li>
     </ul>
   </nav>
-  <main>
-    <div>
-      <section>
+  <main class="card-container">
+    <div class="card-panel card-panel--side">
+      <section class="card card--side">
+        <h2>Configuration</h2>
         <form id="mutate-form">
+          <div class="input-group">
+            <div class="input-group-half">
+                <label for="generation-type">Generation Type</label>
+            </div>
+            <div class="input-group-half">
+                <fieldset id="generation-type" class="radio-group">
+                    <ul>
+                      <li>
+                          <input type="radio" id="tree-radio" name="generation-type" value="tree" checked>
+                          <label for="tree-radio">Phylogentic Tree</label>
+                      </li>
+                      <li>
+                          <input type="radio" id="mutator-radio" name="generation-type" value="mutator">
+                          <label for="mutator-radio">Sequence Mutator</label>
+                      </li>
+                    </ul>
+                </fieldset>
+            </div>
+          </div>
           <div class="input-group">
             <div class="input-group-half">
                 <label for="sequence-type">Sequence Type</label>
@@ -88,9 +107,9 @@
         </form>
       </section>
     </div>
-    <div>
-      <section>
-        <h2>This is temporary</h2>
+    <div class="card-panel card-panel--main">
+      <section class="card">
+        <h2>Temp Output</h2>
         <div id="mutation-list"></div>
       </section>
     </div>

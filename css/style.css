@@ -193,11 +193,9 @@ form {
 
 form > .input-group {
   display: flex;
-  flex: 1;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
 
   min-height: 4rem;
   border-top: 1px solid var(--cr-border-primary);
@@ -216,10 +214,12 @@ form > .input-group:last-of-type {
 form > .input-group output {
   display: inline-block;
 }
-
+.input-group-half:first-child {
+  width: 40%;
+}
 .input-group-half {
   gap: 0.5rem;
-  width: 50%;
+  width: 60%;
 }
 
 .input-group-half.right-align {
@@ -234,6 +234,16 @@ form > .input-group output {
   justify-content: flex-end;
   gap: 0.25rem;
   width: 6rem;
+}
+
+.range-group {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.range-group > input[type="number"] {
+  width: 5.5rem;
 }
 
 .annotated-input {
@@ -336,6 +346,8 @@ em {
 
 fieldset.radio-group {
   border: none;
+  font-size: 1rem;
+
 }
 
 fieldset.radio-group ul {
@@ -365,4 +377,62 @@ fieldset.radio-group label {
   border: 1px solid var(--cr-border-primary);
   border-radius: var(--br-radius-small);
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+main.card-container {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  padding: 1rem;
+  gap: 1rem;
+  background-color: var(--cr-bg-secondary);
+  width: 100%;
+}
+
+@media (width >= 1200px) {
+  main.card-container > .card-panel--side {
+    flex-grow: 1;
+    width: 40%;
+  }
+  main.card-container > .card-panel--main {
+    flex-grow: 3;
+    width: 60%;
+  }
+}
+
+
+@media (width < 1200px) {
+  main.card-container {
+    flex-direction: column;
+    /*
+    main.card-container > .card-panel--side {
+      order: 2;
+    }
+
+    main.card-container > .card-panel--main {
+      order: 1;
+    } */
+  }
+}
+
+@media (width < 600px) {
+  main.card-container {
+    padding: 0;
+  }
+}
+
+.card {
+  background-color: var(--cr-bg-primary);
+  padding: 2rem;
+  width: 100%;
+}
+
+.card > h2 {
+  margin-bottom: 1rem;
+}
+
+#mutation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
