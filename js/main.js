@@ -1,12 +1,13 @@
 import { mutateAminoAcid, mutateNucleotide, mutateSequence } from "./modules/mutators.js";
 import { getThemeIconData, setupTheme, toggleTheme } from "./modules/theme.js";
 import { makeTree } from "./modules/treeview.js";
+import DropwdownButton from "./modules/dropdownButton.js";
 /**
  * What type of generation to use (and display)
  * @type {"tree" | "mutator"}
  * @default "tree"
  */
-let generationType = "tree";
+let generationType = "mutator";
 /**
  * The sequence type to be mutated
  * @type {"peptide" | "nucleotide"}
@@ -41,6 +42,25 @@ let tree = null;
  * @type {Object | null}
  */
 let treeData = null;
+/**
+ * List of all sequences currently displayed, used for exporting
+ * @type {Array<{name: string, sequence: string}>}
+ */
+let displayedSequences = [];
+/**
+ * The export dropdown button
+ * @type {DropwdownButton}
+ */
+let exportDropdown = new DropwdownButton("Export", [
+  { text: "Export as FASTA", callback: () => exportToFASTA() },
+  { text: "Open data in new tab", link: true, callback: () => exportToNewTab() },
+], "export-button");
+
+// replace export button with DropdownButton
+const mutationCard = document.getElementById("mutation-card");
+const exportButton = document.getElementById("export-button-placeholder");
+exportDropdown.insertBefore(mutationCard, exportButton);
+exportButton.remove();
 
 /**
  * Generates a mutation list based on a given sequence and mutation function
@@ -73,8 +93,7 @@ function formatMutationSequence(sequence, mutations) {
   let formattedSequence = sequence.split("");
   mutations.forEach((mutation) => {
     const { index, mutationType, mutation: mutationString } = mutation;
-    // for now, deletes are just empty strings
-    formattedSequence[index] = mutationType !== "delete" ? `<em>${mutationString}</em>` :  "<em></em>" ;
+    formattedSequence[index] = mutationType !== "delete" ? `<em>${mutationString}</em>` :  "<em>_</em>" ;
   });
   return formattedSequence.join("");
 }
@@ -92,6 +111,7 @@ function renderMutationList(mutationListElement, sequence) {
   const originalSequenceElement = document.createElement("div");
   originalSequenceElement.innerHTML = `>Sequence.${sequence.slice(0, 3)}:<br>${sequence}`;
   mutationListElement.appendChild(originalSequenceElement);
+  displayedSequences = [{ name: `Sequence.${sequence.slice(0, 3)}`, sequence }];
   // render each mutation
   modifiedMutations.forEach((mutation, i) => {
     const mutationElement = document.createElement("div");
@@ -100,39 +120,77 @@ function renderMutationList(mutationListElement, sequence) {
       >Sequence.${mutation.sequence.slice(0, 3)}${i}:<br>
       ${formatMutationSequence(sequence, mutation.mutations)}`;
     mutationListElement.appendChild(mutationElement);
+    displayedSequences.push({ name: `Sequence.${mutation.sequence.slice(0, 3)}${i}`, sequence: mutation.sequence });
   });
+
+  console.log(displayedSequences);
 }
 
-function generateTreeData(depth, sequence) {
+function exportToFASTA() {
+  if (displayedSequences.length === 0) return;
+  const fasta = displayedSequences.map((sequence) => `>${sequence.name}\n${sequence.sequence}`).join("\n");
+  const blob = new Blob([fasta], { type: "text/plain" });
+  // download the file using a temporary link
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "sequences.fasta";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportToNewTab() {
+  if (displayedSequences.length === 0) return;
+  const fasta = displayedSequences.map((sequence) => `>${sequence.name}\n${sequence.sequence}`).join("\n");
+  const blob = new Blob([fasta], { type: "text/plain" });
+  // open a new tab with the file
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
+
+// use excel-like column names, i.e. Z then AA then AB
+function numToChars(num) {
+  let chars = "";
+  while (num >= 0) {
+    chars = String.fromCharCode(num % 26 + 65) + chars;
+    num = Math.floor(num / 26) - 1;
+  }
+  return chars;
+}
+
+function generateTreeData(depth, sequence, i = 0) {
   // choose random child count from 0 to maxChildren
   // recurse until depth is 0
   if (depth === 0) {
-    return { name: sequence };
+    return { sequence };
   }
   const mutationFunction = sequenceType === "peptide" ? mutateAminoAcid : mutateNucleotide;
   const currentMaxChildren = Math.floor(Math.random() * maxChildren);
   const mutations = generateMutationList(sequence, mutationFunction, divergencePercentage, currentMaxChildren);
-  const tempChildren = mutations.map((mutation) => generateTreeData(depth - 1, mutation.sequence));
   return {
-    name: sequence,
-    children: tempChildren,
+    sequence,
+    children: mutations.map((mutation, j) => {
+      return generateTreeData(depth - 1, mutation.sequence, ++i);
+    }),
   };
 }
 
 function renderTree(treeElement) {
   treeElement.innerHTML = "";
   const newData = generateTreeData(maxChildren, originalSequence);
-  const printSequences = (node) => {
+  let nodeNum = 0;
+  const updateSequences = (node, childNum = 0) => {
+    node.name = `Sequence.${nodeNum}.${numToChars(childNum)}`;
+    displayedSequences.push({ name: `Sequence.${nodeNum}`, sequence: node.sequence });
+    nodeNum++;
     if (node.children) {
-      node.children.forEach((child) => {
-        printSequences(child);
+      node.children.forEach((child, i) => {
+        updateSequences(child, i);
       });
-
     }
-    console.log(node.name);
   }
+  updateSequences(newData);
   treeData = newData;
-  printSequences(newData);
   tree = makeTree(treeData);
   treeElement.appendChild(tree);
 }
