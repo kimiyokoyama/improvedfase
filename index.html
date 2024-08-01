@@ -91,7 +91,7 @@
             <div class="input-group-half">
                 <div class="range-group">
                     <input type="range" id="divergence-percentage" name="divergence-percentage" min="0" max="1" step="0.001" value="0.1">
-                    <input type="number" id="divergence-percentage-value" name="divergence-percentage-value" min="0" max="1" step="0.001" value="0.1" required>
+                    <input class="small" type="number" id="divergence-percentage-value" name="divergence-percentage-value" min="0" max="1" step="0.001" value="0.1" required>
                 </div>
             </div>
           </div>
@@ -100,7 +100,7 @@
                 <label for="max-children">Maximum Children Per Parent</label>
             </div>
             <div class="input-group-half right-align">
-                <input type="number" id="max-children" name="max-children" min="0" step="1" value="1" required>
+                <input class="small" type="number" id="max-children" name="max-children" min="0" step="1" value="1" required>
             </div>
           </div>
           <button type="submit" id="mutate-button">Mutate</button>
@@ -108,8 +108,8 @@
       </section>
     </div>
     <div class="card-panel card-panel--main">
-      <section class="card">
-        <h2>Temp Output</h2>
+      <section class="card" id="mutation-card">
+        <button id="export-button-placeholder">Export</button>
         <div id="mutation-list"></div>
       </section>
     </div>

@@ -242,10 +242,6 @@ form > .input-group output {
   gap: 0.5rem;
 }
 
-.range-group > input[type="number"] {
-  width: 5.5rem;
-}
-
 .annotated-input {
   display: flex;
   flex: 1;
@@ -263,6 +259,10 @@ form > .input-group output {
 
 .input-group-half.space-align input[type="number"] {
   width: 100%;
+}
+
+.input-group input[type="number"].small {
+  width: 5.5rem;
 }
 
 select, input[type="number"], input[type="text"], textarea {
@@ -370,7 +370,7 @@ fieldset.radio-group input[type="radio"]:checked + label {
 }
 
 fieldset.radio-group label {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   display: inline-block;
   color: var(--cr-text-primary);
   background-color: var(--cr-bg-primary);
@@ -385,7 +385,7 @@ main.card-container {
   flex: 1;
   padding: 1rem;
   gap: 1rem;
-  background-color: var(--cr-bg-secondary);
+  background-color: var(--cr-bg-primary);
   width: 100%;
 }
 
@@ -425,6 +425,8 @@ main.card-container {
   background-color: var(--cr-bg-primary);
   padding: 2rem;
   width: 100%;
+  border-radius: var(--br-radius-small);
+  border: 1px solid var(--cr-border-primary);
 }
 
 .card > h2 {
@@ -435,4 +437,73 @@ main.card-container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-top: 1rem;
+}
+
+.dropdown-button {
+  display: inline-block;
+  position: relative;
+  background-color: var(--cr-bg-primary);
+  color: var(--cr-text-primary);
+  border: 1px solid var(--cr-border-primary);
+  border-radius: var(--br-radius-small);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.dropdown-button + .dropdown-content {
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  background-color: var(--cr-bg-primary);
+  border: 1px solid var(--cr-border-primary);
+  border-radius: var(--br-radius-small);
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  z-index: 1;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.dropdown-button + .dropdown-content.show {
+  opacity: 1;
+}
+
+.dropdown-button + .dropdown-content button {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: left;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: var(--cr-bg-primary);
+  color: var(--cr-text-primary);
+  border: none;
+  border-radius: var(--br-radius-small);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.dropdown-button + .dropdown-content button:hover {
+  background-color: var(--cr-primary);
+  color: var(--cr-text-contrast);
+}
+
+.launch-svg {
+  color: var(--cr-text-primary);
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+button:hover .launch-svg {
+  color: var(--cr-text-contrast);
 }
