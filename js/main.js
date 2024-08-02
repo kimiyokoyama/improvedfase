@@ -63,9 +63,9 @@ let exportDropdown = new DropwdownButton("Export", [
 ], "export-button");
 
 // replace export button with DropdownButton
-const mutationCard = document.getElementById("mutation-card");
+const navCenter = document.getElementById("nav-center");
 const exportButton = document.getElementById("export-button-placeholder");
-exportDropdown.insertBefore(mutationCard, exportButton);
+exportDropdown.insertBefore(navCenter, exportButton);
 exportButton.remove();
 
 /**
@@ -288,6 +288,35 @@ function main() {
   document.getElementById("theme-toggle").addEventListener("click", () => {
     toggleTheme();
     document.getElementById("theme-icon-path").setAttribute("d", getThemeIconData());
+  });
+
+  // --- resize events ---
+  const separators = document.querySelectorAll(".card-separator");
+  separators.forEach((separator) => {
+    // if separator has data-horizontal attribute, resize horizontally
+    const horizontal = separator.getAttribute("data-horizontal") !== null;
+    const previousElement = document.getElementById(separator.getAttribute("data-previous"));
+    const nextElement = document.getElementById(separator.getAttribute("data-next"));
+    const resize = (e) => {
+      // make width of previous element equal to mouse x position and width of next element equal to total width - mouse x position
+      const totalWidth = previousElement.offsetWidth + nextElement.offsetWidth;
+      const previousWidth = horizontal ? e.clientX : e.clientY;
+      const nextWidth = totalWidth - previousWidth;
+      previousElement.style.flexBasis = `${previousWidth - 10}px`;
+      nextElement.style.flexBasis = `${nextWidth + 10}px`;
+    }
+    separator.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      document.addEventListener("mousemove", resize);
+      document.addEventListener("mouseup", () => {
+        document.removeEventListener("mousemove", resize);
+      });
+      // if window is resized, reset the flex basis of the elements
+      window.addEventListener("resize", () => {
+        previousElement.style.flexBasis = "";
+        nextElement.style.flexBasis = "";
+      });
+    });
   });
 }
 
