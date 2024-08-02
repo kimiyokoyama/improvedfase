@@ -94,12 +94,23 @@ function generateMutationList(sequence, mutateFn, divergencePercentage, maxChild
   return mutationList;
 }
 
+function sanatize(s) {
+  return s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 function formatMutationSequence(sequence, mutations) {
   // put em's around mutated characters, mutations happen in order
   let formattedSequence = sequence.split("");
   mutations.forEach((mutation) => {
-    const { index, mutationType, mutation: mutationString } = mutation;
+    let { index, mutationType, mutation: mutationString } = mutation;
+    mutationString = sanatize(mutationString);
     formattedSequence[index] = mutationType !== "delete" ? `<em>${mutationString}</em>` :  "<em>_</em>" ;
+  });
+  // sanatize any non-mutated characters
+  formattedSequence = formattedSequence.map((char) => {
+    if (char === "<") return "&lt;";
+    if (char === ">") return "&gt;";
+    return char;
   });
   return formattedSequence.join("");
 }
@@ -114,17 +125,15 @@ function renderMutationList(mutationListElement, sequence) {
     mutation.mutations = [...modifiedMutations[i].mutations, ...mutation.mutations];
   });
   // render original sequence
-  const originalSequenceElement = document.createElement("div");
-  originalSequenceElement.innerHTML = `>Sequence.${sequence.slice(0, 3)}:<br>${sequence}`;
+  const originalSequenceElement = document.createElement("pre");
+  originalSequenceElement.textContent = `>Sequence.${sequence.slice(0, 3)}:\r\n${sequence}`;
   mutationListElement.appendChild(originalSequenceElement);
   displayedSequences = [{ name: `Sequence.${sequence.slice(0, 3)}`, sequence }];
   // render each mutation
   modifiedMutations.forEach((mutation, i) => {
-    const mutationElement = document.createElement("div");
+    const mutationElement = document.createElement("pre");
     // first three chars in new sequence are the name
-    mutationElement.innerHTML = `
-      >Sequence.${mutation.sequence.slice(0, 3)}${i}:<br>
-      ${formatMutationSequence(sequence, mutation.mutations)}`;
+    mutationElement.innerHTML = sanatize(`>Sequence.${mutation.sequence.slice(0, 3)}${i}:\r\n`) + `${formatMutationSequence(sequence, mutation.mutations)}`;
     mutationListElement.appendChild(mutationElement);
     displayedSequences.push({ name: `Sequence.${mutation.sequence.slice(0, 3)}${i}`, sequence: mutation.sequence });
   });
