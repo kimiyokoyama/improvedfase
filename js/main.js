@@ -27,6 +27,12 @@ let originalSequence = "";
  */
 let maxChildren = 2;
 /**
+ * The depth of the tree to be generated
+ * @type {number}
+ * @default 3
+ */
+let generationDepth = 3;
+/**
  * The percentage of the sequence to be mutated
  * @type {number}
  * @default 0.1
@@ -122,8 +128,6 @@ function renderMutationList(mutationListElement, sequence) {
     mutationListElement.appendChild(mutationElement);
     displayedSequences.push({ name: `Sequence.${mutation.sequence.slice(0, 3)}${i}`, sequence: mutation.sequence });
   });
-
-  console.log(displayedSequences);
 }
 
 function exportToFASTA() {
@@ -177,8 +181,9 @@ function generateTreeData(depth, sequence, i = 0) {
 
 function renderTree(treeElement) {
   treeElement.innerHTML = "";
-  const newData = generateTreeData(maxChildren, originalSequence);
+  const newData = generateTreeData(generationDepth, originalSequence);
   let nodeNum = 0;
+  displayedSequences = [];
   const updateSequences = (node, childNum = 0) => {
     node.name = `Sequence.${nodeNum}.${numToChars(childNum)}`;
     displayedSequences.push({ name: `Sequence.${nodeNum}`, sequence: node.sequence });
