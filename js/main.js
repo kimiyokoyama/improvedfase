@@ -1,13 +1,13 @@
 import { mutateAminoAcid, mutateNucleotide, mutateSequence } from "./modules/mutators.js";
 import { getThemeIconData, setupTheme, toggleTheme } from "./modules/theme.js";
-import { makeTree } from "./modules/treeview.js";
+import { makeTree, formatMutationSequence } from "./modules/treeview.js";
 import DropwdownButton from "./modules/dropdownButton.js";
 /**
  * What type of generation to use (and display)
  * @type {"tree" | "mutator"}
  * @default "tree"
  */
-let generationType = "mutator";
+let generationType = "tree";
 /**
  * The sequence type to be mutated
  * @type {"peptide" | "nucleotide"}
@@ -98,25 +98,7 @@ function sanatize(s) {
   return s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function formatMutationSequence(sequence, mutations) {
-  // put em's around mutated characters, mutations happen in order
-  let formattedSequence = sequence.split("");
-  mutations.forEach((mutation) => {
-    let { index, mutationType, mutation: mutationString } = mutation;
-    mutationString = sanatize(mutationString);
-    formattedSequence[index] = mutationType !== "delete" ? `<em>${mutationString}</em>` :  "<em>_</em>" ;
-  });
-  // sanatize any non-mutated characters
-  formattedSequence = formattedSequence.map((char) => {
-    if (char === "<") return "&lt;";
-    if (char === ">") return "&gt;";
-    return char;
-  });
-  return formattedSequence.join("");
-}
-
 function renderMutationList(mutationListElement, sequence) {
-  mutationListElement.innerHTML = "";
   const mutationFunction = sequenceType === "peptide" ? mutateAminoAcid : mutateNucleotide;
   const mutations = generateMutationList(sequence, mutationFunction, divergencePercentage, maxChildren);
   // for each mutation, add the previous mutations to its own mutation list
@@ -171,25 +153,25 @@ function numToChars(num) {
   return chars;
 }
 
-function generateTreeData(depth, sequence, i = 0) {
+function generateTreeData(depth, sequence, i = 0, mutationList = []) {
   // choose random child count from 0 to maxChildren
   // recurse until depth is 0
   if (depth === 0) {
-    return { sequence };
+    return { sequence, mutations: mutationList };
   }
   const mutationFunction = sequenceType === "peptide" ? mutateAminoAcid : mutateNucleotide;
   const currentMaxChildren = Math.floor(Math.random() * maxChildren);
   const mutations = generateMutationList(sequence, mutationFunction, divergencePercentage, currentMaxChildren);
   return {
     sequence,
+    mutations: mutationList,
     children: mutations.map((mutation, j) => {
-      return generateTreeData(depth - 1, mutation.sequence, ++i);
+      return generateTreeData(depth - 1, mutation.sequence, ++i, [...mutationList, ...mutation.mutations]);
     }),
   };
 }
 
 function renderTree(treeElement) {
-  treeElement.innerHTML = "";
   const newData = generateTreeData(generationDepth, originalSequence);
   let nodeNum = 0;
   displayedSequences = [];
@@ -205,7 +187,7 @@ function renderTree(treeElement) {
   }
   updateSequences(newData);
   treeData = newData;
-  tree = makeTree(treeData);
+  tree = makeTree([newData]);
   treeElement.appendChild(tree);
 }
 
@@ -270,14 +252,17 @@ function main() {
 
   // mutation list display on form submit
   const mutationList = document.getElementById("mutation-list");
+  const mutationTree = document.getElementById("mutation-tree");
   const mutuateForm = document.getElementById("mutate-form");
   mutuateForm.addEventListener("submit", (e) => {
     e.preventDefault();
     originalSequence = originalSequence.toUpperCase();
+    mutationList.innerHTML = "";
+    mutationTree.innerHTML = "";
     if (generationType === "mutator") {
       renderMutationList(mutationList, originalSequence);
     } else {
-      renderTree(mutationList, originalSequence);
+      renderTree(mutationTree);
     }
   });
 
@@ -310,13 +295,37 @@ function main() {
       document.addEventListener("mousemove", resize);
       document.addEventListener("mouseup", () => {
         document.removeEventListener("mousemove", resize);
-      });
+      }, { once: true });
       // if window is resized, reset the flex basis of the elements
       window.addEventListener("resize", () => {
         previousElement.style.flexBasis = "";
         nextElement.style.flexBasis = "";
       });
     });
+  });
+
+  // --- tree view drag events ---
+  const mutationContent = document.getElementById("mutation-content");
+  mutationContent.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    const initialX = e.pageX - mutationContent.offsetLeft;
+    const initialY = e.pageY - mutationContent.offsetTop;
+    const initialScrollLeft = mutationContent.scrollLeft;
+    const initialScrollTop = mutationContent.scrollTop;
+    // set tree to dragging
+    mutationTree.style.cursor = "grabbing";
+    const handleTreeDrag = (e) => {
+      e.preventDefault();
+      const currentX = e.pageX - mutationContent.offsetLeft;
+      const currentY = e.pageY - mutationContent.offsetTop;
+      mutationContent.scrollLeft = Math.max(initialScrollLeft - (currentX - initialX), 0);
+      mutationContent.scrollTop = Math.max(initialScrollTop - (currentY - initialY), 0);
+    };
+    document.addEventListener("mousemove", handleTreeDrag);
+    document.addEventListener("mouseup", () => {
+      document.removeEventListener("mousemove", handleTreeDrag);
+      mutationTree.style.cursor = "";
+    }, { once: true })
   });
 }
 
