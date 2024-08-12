@@ -1,7 +1,7 @@
 import { mutateAminoAcid, mutateNucleotide, mutateSequence } from "./modules/mutators.js";
 import { getThemeIconData, setupTheme, toggleTheme } from "./modules/theme.js";
 import { makeTree, formatMutationSequence } from "./modules/treeview.js";
-import DropwdownButton from "./modules/dropdownButton.js";
+import DropdownButton from "./modules/dropdownButton.js";
 /**
  * What type of generation to use (and display)
  * @type {"tree" | "mutator"}
@@ -55,18 +55,12 @@ let treeData = null;
 let displayedSequences = [];
 /**
  * The export dropdown button
- * @type {DropwdownButton}
+ * @type {DropdownButton}
  */
-let exportDropdown = new DropwdownButton("Export", [
+let exportDropdown = new DropdownButton(document.getElementById("export-button"), [
   { text: "Export as FASTA", callback: () => exportToFASTA() },
   { text: "Open data in new tab", link: true, callback: () => exportToNewTab() },
-], "export-button");
-
-// replace export button with DropdownButton
-const navCenter = document.getElementById("nav-center");
-const exportButton = document.getElementById("export-button-placeholder");
-exportDropdown.insertBefore(navCenter, exportButton);
-exportButton.remove();
+], { closeOnClick: true, above: false, left: true });
 
 /**
  * Generates a mutation list based on a given sequence and mutation function
@@ -257,6 +251,8 @@ function main() {
   mutuateForm.addEventListener("submit", (e) => {
     e.preventDefault();
     originalSequence = originalSequence.toUpperCase();
+    const noDataMessage = document.getElementById("no-data-message");
+    if (noDataMessage) noDataMessage.style.display = "none";
     mutationList.innerHTML = "";
     mutationTree.innerHTML = "";
     if (generationType === "mutator") {
