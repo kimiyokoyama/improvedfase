@@ -54,6 +54,11 @@ let treeData = null;
  */
 let displayedSequences = [];
 /**
+ * Current fullscreen state
+ * @type {boolean}
+ */
+let mainIsFullscreen = false;
+/**
  * The export dropdown button
  * @type {DropdownButton}
  */
@@ -282,9 +287,20 @@ function main() {
       // make width of previous element equal to mouse x position and width of next element equal to total width - mouse x position
       const totalWidth = previousElement.offsetWidth + nextElement.offsetWidth;
       const previousWidth = horizontal ? e.clientX : e.clientY;
+      const previousElementMinWidth = parseInt(getComputedStyle(previousElement.querySelector(".card-content")).minWidth.replace("px", ""));
       const nextWidth = totalWidth - previousWidth;
-      previousElement.style.flexBasis = `${previousWidth - 10}px`;
-      nextElement.style.flexBasis = `${nextWidth + 10}px`;
+      const nextElementMinWidth = parseInt(getComputedStyle(nextElement.querySelector(".card-content")).minWidth.replace("px", ""));
+      if (previousWidth < previousElementMinWidth) {
+        previousElement.style.width = `${previousElementMinWidth}px`;
+        nextElement.style.width = `${totalWidth - previousElementMinWidth}px`;
+      } else if (nextWidth < nextElementMinWidth) {
+        previousElement.style.width = `${totalWidth - nextElementMinWidth}px`;
+        nextElement.style.width = `${nextElementMinWidth}px`;
+      }
+      else {
+        previousElement.style.width = `${previousWidth - 10}px`;
+        nextElement.style.width = `${nextWidth + 10}px`;
+      }
     }
     separator.addEventListener("mousedown", (e) => {
       e.preventDefault();
@@ -294,8 +310,8 @@ function main() {
       }, { once: true });
       // if window is resized, reset the flex basis of the elements
       window.addEventListener("resize", () => {
-        previousElement.style.flexBasis = "";
-        nextElement.style.flexBasis = "";
+        previousElement.style.width = "";
+        nextElement.style.width = "";
       });
     });
   });
@@ -322,6 +338,25 @@ function main() {
       document.removeEventListener("mousemove", handleTreeDrag);
       mutationTree.style.cursor = "";
     }, { once: true })
+  });
+
+  // --- main fullscreen events ---
+  const fullscreenButton = document.getElementById("main-fullscreen-button");
+  fullscreenButton.addEventListener("click", (e) => {
+    // select all panels that aren't the main panel (and the separators)
+    const panels = document.querySelectorAll(".card-panel:not(#main-panel), .card-separator");
+    if (mainIsFullscreen) {
+      fullscreenButton.querySelector('path').setAttribute("d", "M6 14c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h3c.55 0 1-.45 1-1s-.45-1-1-1H7v-2c0-.55-.45-1-1-1m0-4c.55 0 1-.45 1-1V7h2c.55 0 1-.45 1-1s-.45-1-1-1H6c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1m11 7h-2c-.55 0-1 .45-1 1s.45 1 1 1h3c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1s-1 .45-1 1zM14 6c0 .55.45 1 1 1h2v2c0 .55.45 1 1 1s1-.45 1-1V6c0-.55-.45-1-1-1h-3c-.55 0-1 .45-1 1");
+      panels.forEach((panel) => {
+        panel.style.display = "flex";
+      });
+    } else {
+      fullscreenButton.querySelector('path').setAttribute("d", "M6 16h2v2c0 .55.45 1 1 1s1-.45 1-1v-3c0-.55-.45-1-1-1H6c-.55 0-1 .45-1 1s.45 1 1 1m2-8H6c-.55 0-1 .45-1 1s.45 1 1 1h3c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1s-1 .45-1 1zm7 11c.55 0 1-.45 1-1v-2h2c.55 0 1-.45 1-1s-.45-1-1-1h-3c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1m1-11V6c0-.55-.45-1-1-1s-1 .45-1 1v3c0 .55.45 1 1 1h3c.55 0 1-.45 1-1s-.45-1-1-1z");
+      panels.forEach((panel) => {
+        panel.style.display = "none";
+      });
+    }
+    mainIsFullscreen = !mainIsFullscreen;
   });
 }
 
