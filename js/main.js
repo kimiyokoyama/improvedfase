@@ -385,12 +385,44 @@ function main() {
   const modalContainers = document.querySelectorAll(".modal-container");
   modalContainers.forEach((modalContainer) => {
     modalContainer.addEventListener("click", (e) => {
-      console.log(e.target);
       if (e.target === modalContainer) {
         toggleModal(modalContainer.id);
       }
     });
   });
+
+  // --- handle file listing ---
+  const fetchGitFiles = async () => {
+    const response = await fetch("https://api.github.com/repos/bio-sims/fase/contents/files");
+    if (!response.ok) {
+      const errorMessage = document.createElement("p");
+      errorMessage.classList.add("error");
+      errorMessage.textContent = "An error occurred while fetching files";
+      document.getElementById("files-modal-list").appendChild(errorMessage);
+      return;
+    }
+    const data = await response.json();
+    const files = data.filter((file) => file.type === "file");
+    const fileListing = document.getElementById("files-modal-list");
+
+    if (files.length === 0) {
+      const noDataMessage = document.createElement("li");
+      noDataMessage.classList.add("error");
+      noDataMessage.textContent = "No files found!";
+      fileListing.appendChild(noDataMessage);
+    } else {
+      fileListing.insertBefore(document.createElement("p"), fileListing.firstChild).textContent = "Available supplemental materials";
+      files.forEach((file) => {
+        const fileElement = document.createElement("li");
+        const fileLink = document.createElement("a");
+        fileLink.href = file.download_url;
+        fileLink.textContent = file.name;
+        fileElement.appendChild(fileLink);
+        fileListing.appendChild(fileElement);
+      });
+    }
+  };
+  fetchGitFiles();
 }
 
 main();
