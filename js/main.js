@@ -205,6 +205,20 @@ function setupRadioGroup(radioGroup, valueFn) {
   return radios;
 }
 
+function toggleModal(modalID) {
+  const modal = document.getElementById(modalID);
+  if (modal.classList.contains("show")) {
+    modal.classList.remove("show");
+  } else {
+    // close all other modals
+    const modals = document.querySelectorAll(".modal-container");
+    modals.forEach((m) => {
+      m.classList.remove("show");
+    });
+    modal.classList.add("show");
+  }
+}
+
 function main() {
   // --- form events ---
   // generation type
@@ -357,6 +371,25 @@ function main() {
       });
     }
     mainIsFullscreen = !mainIsFullscreen;
+  });
+
+  // --- modal events ---
+  const modalButtons = document.querySelectorAll("[data-toggles-modal]");
+  modalButtons.forEach((button) => {
+    button.addEventListener("click", (e) => {
+      toggleModal(e.target.getAttribute("data-toggles-modal"));
+    });
+  });
+
+  // clicking outside of a modal closes it (on the modal-container)
+  const modalContainers = document.querySelectorAll(".modal-container");
+  modalContainers.forEach((modalContainer) => {
+    modalContainer.addEventListener("click", (e) => {
+      console.log(e.target);
+      if (e.target === modalContainer) {
+        toggleModal(modalContainer.id);
+      }
+    });
   });
 }
 
