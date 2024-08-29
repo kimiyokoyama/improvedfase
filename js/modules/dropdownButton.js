@@ -64,9 +64,9 @@ export default class DropdownButton {
     this.isOpen = open;
     if (this.dropdown) {
       if (this.above) {
-        this.dropdown.style.bottom = `${this.button.offsetHeight + 4}px`;
+        this.dropdown.style.bottom = `${this.button.offsetHeight + 6}px`;
       } else {
-        this.dropdown.style.top = `${this.button.offsetHeight + 4}px`;
+        this.dropdown.style.top = `${this.button.offsetHeight + 6}px`;
       }
       if (this.left) {
         this.dropdown.style.left = "0";

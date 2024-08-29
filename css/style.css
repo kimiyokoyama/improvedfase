@@ -162,6 +162,22 @@ nav li.right-align {
   gap: 2rem;
 }
 
+@media (width < 600px) {
+  nav > ul:first-of-type {
+    display: none;
+  }
+  nav > ul {
+    width: unset;
+  }
+  nav li.right-align {
+    margin-left: 0;
+    padding: 0;
+  }
+  nav {
+    justify-content: center;
+  }
+}
+
 svg {
   user-select: none;
   touch-action: none;
@@ -189,6 +205,7 @@ button.svg-button > svg {
 form {
   display: flex;
   flex-direction: column;
+  user-select: none;
   gap: 0;
 }
 
@@ -521,7 +538,6 @@ button.icon-button svg {
   flex-direction: column;
   position: absolute;
   right: 0;
-  bottom: 3rem;
   background-color: var(--cr-bg-primary);
   border: 1px solid var(--cr-border-primary);
   border-radius: var(--br-radius-small);
@@ -699,6 +715,7 @@ div.merged-button-group {
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
+  padding: 0 0.5rem;
 }
 
 div.modal-container {
@@ -746,6 +763,17 @@ article.modal {
   }
 }
 
+article.modal button {
+  background-color: transparent;
+  padding: 0.25rem 0.5rem;
+  align-self: flex-end;
+}
+
+article.modal button:hover {
+  background-color: var(--cr-warning);
+  border-color: var(--cr-warning);
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -774,4 +802,33 @@ article.modal {
 
 .modal-content p:last-of-type {
   margin-bottom: 0;
+}
+
+#files-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  list-style-type: none;
+  min-width: 400px;
+}
+
+#files-modal-list a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  color: var(--cr-text-primary);
+  background-color: var(--cr-bg-primary);
+  border: 1px solid var(--cr-border-primary);
+  border-radius: var(--br-radius-small);
+  transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+#files-modal-list a:hover {
+  background-color: var(--cr-bg-secondary);
+}
+
+#files-modal-list p.error,
+#files-modal-list li.error {
+  color: var(--cr-warning);
 }
