@@ -10,7 +10,7 @@ import DropdownButton from "./modules/dropdownButton.js";
 let generationType = "tree";
 /**
  * The sequence type to be mutated
- * @type {"peptide" | "nucleotide"}
+ * @type {"peptide"}
  * @default "peptide"
  */
 let sequenceType = "peptide";
@@ -70,7 +70,7 @@ let exportDropdown = new DropdownButton(document.getElementById("export-button")
 /**
  * Generates a mutation list based on a given sequence and mutation function
  * @param {string} sequence - the sequence to be mutated.
- * @param {(string) => string} mutateFn - the function used to mutate a single nucleotide
+ * @param {(string) => string} mutateFn - the function used to mutate a single base
  * @param {number} divergencePercentage - the percentage of the sequence to be mutated
  * @param {number} maxChildren - the maximum number of children in the mutation list
  * @return {Array} the mutation list, condensed if it exceeds the maximum number of children
@@ -220,13 +220,6 @@ function main() {
     if (value) generationType = value;
     return generationType;
   });
-  // sequence type
-  const sequenceTypeFieldset = document.getElementById("sequence-type");
-  setupRadioGroup(sequenceTypeFieldset, (value) => {
-    if (value) sequenceType = value;
-    return sequenceType;
-  });
-
   // sequence input
   const sequenceInput = document.getElementById("sequence");
   sequenceInput.addEventListener("input", (e) => {
