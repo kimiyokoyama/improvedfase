@@ -159,14 +159,21 @@ function generateTreeData(depth, sequence, i = 0, mutationList = []) {
     return { sequence, mutations: mutationList };
   }
   const mutationFunction = sequenceType === "peptide" ? mutateAminoAcid : mutateNucleotide;
-  const mutations = generateMutationList(sequence, mutationFunction, divergencePercentage, currentMaxChildren);
   const currentMaxChildren = Math.floor(Math.random() * maxChildren) + 1;
+  const children = [];
+  for (let j = 0; j < currentMaxChildren; j++) {
+    const { sequence: childSequence, mutationList: childMutations } = mutateSequence(sequence, mutationFunction, divergencePercentage);
+    children.push(generateTreeData(
+      depth - 1,
+      childSequence,
+      i * maxChildren + j,
+      [...mutationList, ...childMutations.flatMap(m => m.mutations)]
+    ));
+  }
   return {
     sequence,
     mutations: mutationList,
-    children: mutations.map((mutation, j) => {
-      return generateTreeData(depth - 1, mutation.sequence, ++i, [...mutationList, ...mutation.mutations]);
-    }),
+    children
   };
 }
 
