@@ -214,12 +214,6 @@ function setupRadioGroup(radioGroup, valueFn) {
 
 function main() {
   // --- form events ---
-  // generation type
-  const generationTypeFieldset = document.getElementById("generation-type");
-  setupRadioGroup(generationTypeFieldset, (value) => {
-    if (value) generationType = value;
-    return generationType;
-  });
   // sequence input
   const sequenceInput = document.getElementById("sequence");
   sequenceInput.addEventListener("input", (e) => {
@@ -260,11 +254,7 @@ function main() {
     if (noDataMessage) noDataMessage.style.display = "none";
     mutationList.innerHTML = "";
     mutationTree.innerHTML = "";
-    if (generationType === "mutator") {
-      renderMutationList(mutationList, originalSequence);
-    } else {
-      renderTree(mutationTree);
-    }
+    renderTree(mutationTree);
   });
 
   // --- theme events ---
