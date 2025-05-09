@@ -1,6 +1,6 @@
 import { mutateAminoAcid, mutateNucleotide, mutateSequence } from "./modules/mutators.js";
 import { getThemeIconData, setupTheme, toggleTheme } from "./modules/theme.js";
-import { makeTree, formatMutationSequence } from "./modules/treeview.js";
+import { makeTree, formatMutationSequence, collectLeafSequences } from "./modules/treeview.js";
 import DropdownButton from "./modules/dropdownButton.js";
 /**
  * What type of generation to use (and display)
@@ -66,6 +66,15 @@ let exportDropdown = new DropdownButton(document.getElementById("export-button")
   { text: "Export as FASTA", callback: () => exportToFASTA() },
   { text: "Open data in new tab", link: true, callback: () => exportToNewTab() },
 ], { closeOnClick: true, above: false, left: true });
+
+/**
+ * Formats an array of sequences into FASTA format.
+ * @param {Array<string>} sequences - The peptide sequences to format.
+ * @returns {string} Formatted FASTA string.
+ */
+function formatToFasta(sequences) {
+  return sequences.map((seq, i) => `>Leaf_${i + 1}\n${seq}`).join('\n\n');
+}
 
 /**
  * Generates a mutation list based on a given sequence and mutation function
@@ -192,6 +201,15 @@ function renderTree(treeElement) {
     }
   }
   updateSequences(newData);
+  treeData = newData;
+  console.log("newData", newData); // inspect tree structure
+
+  const leafSequences = collectLeafSequences([newData]);
+  console.log("leafSequences", leafSequences); // check what gets returned
+  
+  const fastaText = formatToFasta(leafSequences);
+  console.log("fastaText", fastaText); // check final output
+  document.getElementById("fastaOutput").textContent = fastaText;
   treeData = newData;
   tree = makeTree([newData]);
   treeElement.appendChild(tree);

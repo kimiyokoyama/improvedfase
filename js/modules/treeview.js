@@ -50,7 +50,33 @@ function makeTree(data) {
   return rootList;
 }
 
+/**
+ * Collects all leaf node sequences from a mutation tree.
+ * A leaf is defined as a node with no children.
+ * 
+ * @param {Array<Object>} data - Array of mutation tree nodes, each with a sequence and optional children.
+ * @returns {Array<string>} Array of sequences from all leaf nodes.
+ */
+function collectLeafSequences(data) {
+  const leaves = [];
+
+  function dfs(nodeList) {
+    nodeList.forEach(node => {
+      if (!node.children || node.children.length === 0) {
+        leaves.push(node.sequence);
+      } else {
+        dfs(node.children);
+      }
+    });
+  }
+
+  dfs(data);
+  return leaves;
+}
+
+
 export {
   makeTree,
   formatMutationSequence,
+  collectLeafSequences
 }
