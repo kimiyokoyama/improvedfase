@@ -159,8 +159,8 @@ function generateTreeData(depth, sequence, i = 0, mutationList = []) {
     return { sequence, mutations: mutationList };
   }
   const mutationFunction = sequenceType === "peptide" ? mutateAminoAcid : mutateNucleotide;
-  const currentMaxChildren = Math.floor(Math.random() * maxChildren);
   const mutations = generateMutationList(sequence, mutationFunction, divergencePercentage, currentMaxChildren);
+  const currentMaxChildren = Math.floor(Math.random() * maxChildren) + 1;
   return {
     sequence,
     mutations: mutationList,
