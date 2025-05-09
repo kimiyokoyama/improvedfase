@@ -145,17 +145,20 @@
               </div>
             </div>
             <button type="submit" id="mutate-button">Mutate</button>
+            <div id="alignment-controls" style="display: none;">
+              <button id="alignment-button">Show Alignment & Phylogenetic Tree</button>
+            </div>   
           </form>
-        </div>
-      </section>
-      <div id="fasta-output-container">
-        <h3>Leaf Sequences (FASTA)</h3>
-        <pre id="fastaOutput"></pre>
-      </div>      
+        </div>     
+      </section>  
     </div>
     <div class="card-separator" data-horizontal data-previous="side-panel" data-next="main-panel"></div>
     <div class="card-panel card-panel--main" id="main-panel">
       <section class="card" id="mutation-card">
+        <div id="fasta-output-container">
+          <h2>Leaf Sequences (FASTA)</h2>
+          <pre id="fastaOutput"></pre>
+        </div>    
         <div class="card-content" id="mutation-content">
           <div id="no-data-message">No data to display</div>
           <div id="mutation-list"></div>

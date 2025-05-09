@@ -202,18 +202,36 @@ function renderTree(treeElement) {
   }
   updateSequences(newData);
   treeData = newData;
-  console.log("newData", newData); // inspect tree structure
-
   const leafSequences = collectLeafSequences([newData]);
-  console.log("leafSequences", leafSequences); // check what gets returned
-  
   const fastaText = formatToFasta(leafSequences);
-  console.log("fastaText", fastaText); // check final output
   document.getElementById("fastaOutput").textContent = fastaText;
+  document.getElementById("alignment-controls").style.display = "block";
   treeData = newData;
   tree = makeTree([newData]);
   treeElement.appendChild(tree);
 }
+
+const alignmentButton = document.getElementById("alignment-button");
+alignmentButton.addEventListener("click", () => {
+  const mockAlignment = `
+>Leaf_1
+ACADAA--AAAALA
+>Leaf_2
+AAEAAHAAAAARAA
+>Leaf_3
+AAEAAHAAAAAAAE
+`;
+
+  document.getElementById("mutation-list").innerHTML = ""; // optionally clear
+  document.getElementById("mutation-tree").innerHTML = ""; // optionally clear
+
+  const alignmentOutput = document.createElement("pre");
+  alignmentOutput.textContent = mockAlignment;
+  alignmentOutput.classList.add("alignment-output");
+
+  // You can append it anywhere you'd like for now
+  document.getElementById("mutation-content").appendChild(alignmentOutput);
+});
 
 function setupRadioGroup(radioGroup, valueFn) {
   const radios = radioGroup.querySelectorAll("input[type='radio']");
