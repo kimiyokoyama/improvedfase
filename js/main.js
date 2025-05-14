@@ -1,6 +1,6 @@
 import { mutateAminoAcid, mutateNucleotide, mutateSequence } from "./modules/mutators.js";
 import { getThemeIconData, setupTheme, toggleTheme } from "./modules/theme.js";
-import { makeTree, formatMutationSequence, collectLeafSequences } from "./modules/treeview.js";
+import { applyMutations, makeTree, formatMutationSequence, collectLeafSequences } from "./modules/treeview.js";
 import DropdownButton from "./modules/dropdownButton.js";
 /**
  * What type of generation to use (and display)
@@ -106,29 +106,6 @@ function sanatize(s) {
   return s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function renderMutationList(mutationListElement, sequence) {
-  const mutationFunction = sequenceType === "peptide" ? mutateAminoAcid : mutateNucleotide;
-  const mutations = generateMutationList(sequence, mutationFunction, divergencePercentage, maxChildren);
-  // for each mutation, add the previous mutations to its own mutation list
-  const modifiedMutations = [...mutations];
-  modifiedMutations.slice(1).forEach((mutation, i) => {
-    mutation.mutations = [...modifiedMutations[i].mutations, ...mutation.mutations];
-  });
-  // render original sequence
-  const originalSequenceElement = document.createElement("pre");
-  originalSequenceElement.textContent = `>Sequence.${sequence.slice(0, 3)}:\r\n${sequence}`;
-  mutationListElement.appendChild(originalSequenceElement);
-  displayedSequences = [{ name: `Sequence.${sequence.slice(0, 3)}`, sequence }];
-  // render each mutation
-  modifiedMutations.forEach((mutation, i) => {
-    const mutationElement = document.createElement("pre");
-    // first three chars in new sequence are the name
-    mutationElement.innerHTML = sanatize(`>Sequence.${mutation.sequence.slice(0, 3)}${i}:\r\n`) + `${formatMutationSequence(sequence, mutation.mutations)}`;
-    mutationListElement.appendChild(mutationElement);
-    displayedSequences.push({ name: `Sequence.${mutation.sequence.slice(0, 3)}${i}`, sequence: mutation.sequence });
-  });
-}
-
 function exportToFASTA() {
   if (displayedSequences.length === 0) return;
   const fasta = displayedSequences.map((sequence) => `>${sequence.name}\n${sequence.sequence}`).join("\n");
@@ -188,10 +165,12 @@ function generateTreeData(depth, sequence, i = 0, mutationList = []) {
 
 function renderTree(treeElement) {
   const newData = generateTreeData(generationDepth, originalSequence);
+  console.log(JSON.stringify(newData, null, 2));
   let nodeNum = 0;
   displayedSequences = [];
   const updateSequences = (node, childNum = 0) => {
     node.name = `Sequence.${nodeNum}.${numToChars(childNum)}`;
+    node.sequence = applyMutations(originalSequence, node.mutations || []);
     displayedSequences.push({ name: `Sequence.${nodeNum}`, sequence: node.sequence });
     nodeNum++;
     if (node.children) {
@@ -202,17 +181,23 @@ function renderTree(treeElement) {
   }
   updateSequences(newData);
   treeData = newData;
-  const leafSequences = collectLeafSequences([newData]);
+  const leafSequences = collectLeafSequences([newData], originalSequence);
   const fastaText = formatToFasta(leafSequences);
   document.getElementById("fastaOutput").textContent = fastaText;
   document.getElementById("alignment-controls").style.display = "block";
   treeData = newData;
-  tree = makeTree([newData]);
+  tree = makeTree([newData], originalSequence);
   treeElement.appendChild(tree);
 }
 
+/*
 const alignmentButton = document.getElementById("alignment-button");
 alignmentButton.addEventListener("click", () => {
+  // 🧹 Remove any existing alignment view
+  const oldAlignment = document.querySelector(".alignment-output");
+  if (oldAlignment) oldAlignment.remove();
+
+  // 📄 Mock alignment text
   const mockAlignment = `
 >Leaf_1
 ACADAA--AAAALA
@@ -222,16 +207,14 @@ AAEAAHAAAAARAA
 AAEAAHAAAAAAAE
 `;
 
-  document.getElementById("mutation-list").innerHTML = ""; // optionally clear
-  document.getElementById("mutation-tree").innerHTML = ""; // optionally clear
-
+  // 🖼️ Create and append alignment display
   const alignmentOutput = document.createElement("pre");
   alignmentOutput.textContent = mockAlignment;
   alignmentOutput.classList.add("alignment-output");
 
-  // You can append it anywhere you'd like for now
   document.getElementById("mutation-content").appendChild(alignmentOutput);
 });
+*/
 
 function setupRadioGroup(radioGroup, valueFn) {
   const radios = radioGroup.querySelectorAll("input[type='radio']");
@@ -286,12 +269,31 @@ function main() {
   mutuateForm.addEventListener("submit", (e) => {
     e.preventDefault();
     originalSequence = originalSequence.toUpperCase();
+  
     const noDataMessage = document.getElementById("no-data-message");
     if (noDataMessage) noDataMessage.style.display = "none";
+  
     mutationList.innerHTML = "";
     mutationTree.innerHTML = "";
+  
+    document.querySelectorAll(".alignment-output").forEach(el => el.remove());
+  
     renderTree(mutationTree);
-  });
+  
+    const mockAlignment = `
+  >Leaf_1
+  ACADAA--AAAALA
+  >Leaf_2
+  AAEAAHAAAAARAA
+  >Leaf_3
+  AAEAAHAAAAAAAE
+    `;
+  
+    const alignmentOutput = document.createElement("pre");
+    alignmentOutput.textContent = mockAlignment;
+    alignmentOutput.classList.add("alignment-output");
+    document.getElementById("mutation-content").appendChild(alignmentOutput);
+  });  
 
   // --- theme events ---
   setupTheme();

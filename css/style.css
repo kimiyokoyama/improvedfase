@@ -717,3 +717,29 @@ div.merged-button-group {
   gap: 0.5rem;
   padding: 0 0.5rem;
 }
+
+.grid-outputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 1rem;
+}
+
+.output-box {
+  border: 1px solid var(--cr-border-primary);
+  border-radius: var(--br-radius-small);
+  padding: 1rem;
+  background-color: var(--cr-bg-secondary);
+  overflow: auto;
+  max-height: 400px;
+}
+
+.output-box h2 {
+  margin-bottom: 0.5rem;
+}
+
+#alignmentOutput {
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+
