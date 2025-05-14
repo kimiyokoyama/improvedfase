@@ -73,7 +73,7 @@ let exportDropdown = new DropdownButton(document.getElementById("export-button")
  * @returns {string} Formatted FASTA string.
  */
 function formatToFasta(sequences) {
-  return sequences.map((seq, i) => `>Leaf_${i + 1}\n${seq}`).join('\n\n');
+  return sequences.map((seq, i) => `>Leaf_${i + 1}\n${seq}`).join('\n');
 }
 
 /**
